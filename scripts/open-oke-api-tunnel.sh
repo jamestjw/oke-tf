@@ -76,12 +76,15 @@ if [[ "${SETUP_KUBECONFIG}" == "true" ]]; then
   oci ce cluster create-kubeconfig \
     --cluster-id "${OKE_CLUSTER_ID}" \
     --file "${KUBECONFIG_PATH}" \
+    --overwrite \
     --region "${OCI_REGION}" \
     --token-version 2.0.0 \
     --kube-endpoint PRIVATE_ENDPOINT >/dev/null
 
   CLUSTER_NAME="$(KUBECONFIG="${KUBECONFIG_PATH}" kubectl config get-clusters | awk 'NR==2 {print $1}')"
+  CONTEXT_NAME="$(KUBECONFIG="${KUBECONFIG_PATH}" kubectl config get-contexts -o name | awk 'NR==1 {print $1}')"
   KUBECONFIG="${KUBECONFIG_PATH}" kubectl config set-cluster "${CLUSTER_NAME}" --server="https://127.0.0.1:${LOCAL_PORT}" >/dev/null
+  KUBECONFIG="${KUBECONFIG_PATH}" kubectl config use-context "${CONTEXT_NAME}" >/dev/null
 
   printf 'Prepared kubeconfig: %s\n' "${KUBECONFIG_PATH}"
   printf 'In another terminal run:\n'

@@ -8,6 +8,20 @@ kubeconfig_path = "~/.kube/oracle-oke-free.yaml"
 argocd_namespace = "argocd"
 argocd_hostname  = "argocd.example.com"
 
+# Enable Terraform-managed GitOps bootstrap.
+argocd_bootstrap_enabled = false
+
+# Private GitHub repository accessed by Argo CD over HTTPS with a PAT.
+argocd_repo_url      = "https://github.com/jamestjw/cluster-gitops.git"
+argocd_repo_username = "git"
+argocd_repo_pat      = "replace-with-github-pat"
+
+# Root Application created by Terraform. It points Argo CD at the directory
+# that contains child Application manifests.
+argocd_root_application_name     = "root-applications"
+argocd_root_application_path     = "argocd"
+argocd_root_application_revision = "main"
+
 # ingress-nginx
 ingress_namespace = "ingress-nginx"
 

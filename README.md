@@ -209,6 +209,11 @@ This stack installs:
 - `ingress-nginx` via Helm
 - `argocd` via Helm
 
+If `argocd_bootstrap_enabled = true`, Terraform also bootstraps Argo CD against your GitOps repository by creating:
+
+- an Argo CD repository credential secret for HTTPS access to the private repo
+- a root Argo CD `Application` that points at the directory containing child `Application` manifests
+
 The default ingress controller service is configured to request an OCI Network Load Balancer.
 
 After apply, get the initial Argo CD admin password with:
@@ -232,6 +237,39 @@ http://127.0.0.1:8080
 ```
 
 Use username `admin` and the password retrieved from the initial admin secret.
+
+## Argo CD GitOps Bootstrap
+
+The recommended pattern is:
+
+1. Terraform installs Argo CD.
+2. Terraform creates one root Argo CD `Application`.
+3. Argo CD reads the private Git repository and applies the child `Application` manifests stored there.
+4. Those child applications then deploy your Helm charts from Git.
+
+For a private GitHub repo over HTTPS with a personal access token, set these variables in `stacks/platform-bootstrap/terraform.tfvars`:
+
+```hcl
+argocd_bootstrap_enabled = true
+argocd_repo_url          = "https://github.com/jamestjw/cluster-gitops.git"
+argocd_repo_username     = "git"
+argocd_repo_pat          = "<github-pat>"
+
+argocd_root_application_name     = "root-applications"
+argocd_root_application_path     = "argocd"
+argocd_root_application_revision = "main"
+```
+
+The root application is created directly by Terraform, not from inside the managed Git path. This avoids having the root app manage itself.
+
+After `terraform apply`, verify bootstrap with:
+
+```bash
+kubectl -n argocd get applications
+argocd app list
+```
+
+The root application should appear first, then the child applications from `cluster-gitops/argocd/` should be created by Argo CD.
 
 # Architecture
 See `docs/architecture.md` for the detailed design.

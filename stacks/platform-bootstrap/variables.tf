@@ -50,3 +50,39 @@ variable "argocd_server_insecure" {
   type    = bool
   default = true
 }
+
+variable "argocd_bootstrap_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "argocd_repo_url" {
+  type    = string
+  default = "https://github.com/jamestjw/cluster-gitops.git"
+}
+
+variable "argocd_repo_username" {
+  type    = string
+  default = "git"
+}
+
+variable "argocd_repo_pat" {
+  type      = string
+  default   = null
+  sensitive = true
+}
+
+variable "argocd_root_application_name" {
+  type    = string
+  default = "root-applications"
+}
+
+variable "argocd_root_application_path" {
+  type    = string
+  default = "argocd"
+}
+
+variable "argocd_root_application_revision" {
+  type    = string
+  default = "main"
+}

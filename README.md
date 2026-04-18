@@ -123,6 +123,20 @@ The stacks intentionally use different state keys:
 - `infra-free-tier/terraform.tfstate`
 - `platform-bootstrap/terraform.tfstate`
 
+### 4. Create local Terraform variable files
+
+Copy the committed example files and customize them for your tenancy, compartment, and cluster settings:
+
+```bash
+cp stacks/infra-free-tier/terraform.tfvars.example stacks/infra-free-tier/terraform.tfvars
+cp stacks/platform-bootstrap/terraform.tfvars.example stacks/platform-bootstrap/terraform.tfvars
+```
+
+You should review and update the values in:
+
+- `stacks/infra-free-tier/terraform.tfvars`
+- `stacks/platform-bootstrap/terraform.tfvars`
+
 ### Notes
 
 - The bucket must already exist before `terraform init`.

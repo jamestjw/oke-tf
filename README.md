@@ -80,6 +80,12 @@ terraform {
 
 Use OCI Object Storage through Terraform's S3-compatible backend.
 
+If you do not want to store Terraform state in OCI Object Storage yet, you can keep state local instead. In that case:
+
+- do not create `backend.hcl`
+- run `terraform init` without `-backend-config=backend.hcl`
+- keep the generated local state files on your workstation
+
 ### 1. Get your Object Storage namespace
 
 ```bash
@@ -129,7 +135,8 @@ After configuring `stacks/infra-free-tier/backend.hcl` and `stacks/infra-free-ti
 
 ```bash
 cd stacks/infra-free-tier
-../../scripts/tf.sh init
+../../scripts/tf.sh init -backend-config=backend.hcl
+# If you want to keep state local instead, use: ../../scripts/tf.sh init
 ../../scripts/tf.sh plan
 ../../scripts/tf.sh apply
 ```
@@ -218,7 +225,8 @@ After the Bastion tunnel is up and `KUBECONFIG` is exported, bootstrap the clust
 
 ```bash
 cd stacks/platform-bootstrap
-../../scripts/tf.sh init
+../../scripts/tf.sh init -backend-config=backend.hcl
+# If you want to keep state local instead, use: ../../scripts/tf.sh init
 ../../scripts/tf.sh plan
 ../../scripts/tf.sh apply
 ```

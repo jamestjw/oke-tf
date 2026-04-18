@@ -60,6 +60,97 @@ oracle-tf/
 3. Run `stacks/platform-bootstrap` from that private execution environment.
 4. Let Argo CD take ownership of application and add-on manifests after bootstrap.
 
+## Remote State
+
+Both stacks are configured for partial backend configuration:
+
+```hcl
+terraform {
+  backend "s3" {}
+}
+```
+
+Use OCI Object Storage through Terraform's S3-compatible backend.
+
+### 1. Get your Object Storage namespace
+
+```bash
+oci os ns get
+```
+
+### 2. Create a bucket
+
+Example:
+
+```bash
+oci os bucket create \
+  --namespace-name "<namespace>" \
+  --compartment-id "<compartment-ocid>" \
+  --name "oracle-tf-state"
+```
+
+### 3. Create local backend config files
+
+Copy the committed examples:
+
+```bash
+cp stacks/infra-free-tier/backend.hcl.example stacks/infra-free-tier/backend.hcl
+cp stacks/platform-bootstrap/backend.hcl.example stacks/platform-bootstrap/backend.hcl
+```
+
+Then replace:
+
+- bucket name
+- region
+- Object Storage namespace in the endpoint URL
+
+The stacks intentionally use different state keys:
+
+- `infra-free-tier/terraform.tfstate`
+- `platform-bootstrap/terraform.tfstate`
+
+### 4. Migrate `infra-free-tier`
+
+Back up local state first:
+
+```bash
+cp stacks/infra-free-tier/terraform.tfstate stacks/infra-free-tier/terraform.tfstate.backup
+```
+
+Then migrate:
+
+```bash
+chmod +x scripts/tf.sh
+cd stacks/infra-free-tier
+../../scripts/tf.sh init -backend-config=backend.hcl -migrate-state
+../../scripts/tf.sh state list
+../../scripts/tf.sh plan
+```
+
+### 5. Migrate `platform-bootstrap`
+
+Back up local state first:
+
+```bash
+cp stacks/platform-bootstrap/terraform.tfstate stacks/platform-bootstrap/terraform.tfstate.backup
+```
+
+Then migrate:
+
+```bash
+cd stacks/platform-bootstrap
+../../scripts/tf.sh init -backend-config=backend.hcl -migrate-state
+../../scripts/tf.sh state list
+../../scripts/tf.sh plan
+```
+
+### Notes
+
+- Migrate one stack at a time.
+- The bucket must already exist before `terraform init`.
+- OCI Object Storage does not provide DynamoDB-style state locking for the S3 backend, so avoid concurrent applies.
+- The `scripts/tf.sh` wrapper sets the AWS SDK checksum environment variables required for OCI Object Storage compatibility.
+
 ## Bastion Access
 
 Use OCI Bastion port forwarding to reach the private OKE API from your laptop.

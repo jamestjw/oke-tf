@@ -109,44 +109,8 @@ The stacks intentionally use different state keys:
 - `infra-free-tier/terraform.tfstate`
 - `platform-bootstrap/terraform.tfstate`
 
-### 4. Migrate `infra-free-tier`
-
-Back up local state first:
-
-```bash
-cp stacks/infra-free-tier/terraform.tfstate stacks/infra-free-tier/terraform.tfstate.backup
-```
-
-Then migrate:
-
-```bash
-chmod +x scripts/tf.sh
-cd stacks/infra-free-tier
-../../scripts/tf.sh init -backend-config=backend.hcl -migrate-state
-../../scripts/tf.sh state list
-../../scripts/tf.sh plan
-```
-
-### 5. Migrate `platform-bootstrap`
-
-Back up local state first:
-
-```bash
-cp stacks/platform-bootstrap/terraform.tfstate stacks/platform-bootstrap/terraform.tfstate.backup
-```
-
-Then migrate:
-
-```bash
-cd stacks/platform-bootstrap
-../../scripts/tf.sh init -backend-config=backend.hcl -migrate-state
-../../scripts/tf.sh state list
-../../scripts/tf.sh plan
-```
-
 ### Notes
 
-- Migrate one stack at a time.
 - The bucket must already exist before `terraform init`.
 - OCI Object Storage does not provide DynamoDB-style state locking for the S3 backend, so avoid concurrent applies.
 - The `scripts/tf.sh` wrapper sets the AWS SDK checksum environment variables required for OCI Object Storage compatibility.
@@ -266,11 +230,5 @@ http://127.0.0.1:8080
 
 Use username `admin` and the password retrieved from the initial admin secret.
 
-## Why This Is The Professional Split
-
-- Private control plane stays private.
-- Terraform does not depend on a fragile local tunnel for the first stack.
-- In-cluster resources are applied only from a network path that can reliably reach the Kubernetes API.
-- Argo CD becomes the steady-state deployment mechanism after bootstrap.
-
+# Architecture
 See `docs/architecture.md` for the detailed design.

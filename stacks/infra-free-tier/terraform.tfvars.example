@@ -1,0 +1,40 @@
+# OCI identity
+tenancy_ocid     = "ocid1.tenancy.oc1..example"
+compartment_ocid = "ocid1.compartment.oc1..example"
+region           = "eu-frankfurt-1"
+
+# Optional OCI CLI profile
+# oci_config_profile = "DEFAULT"
+
+# Naming
+project_name = "oracle-oke"
+environment  = "free"
+
+# Cluster
+cluster_name        = "oracle-oke-free"
+kubernetes_version  = "v1.30.1"
+
+# Networking
+vcn_cidr             = "10.0.0.0/16"
+endpoint_subnet_cidr = "10.0.0.0/28"
+worker_subnet_cidr   = "10.0.1.0/24"
+pod_subnet_cidr      = "10.0.2.0/24"
+lb_subnet_cidr       = "10.0.3.0/24"
+
+# Node pool
+node_shape         = "VM.Standard.A1.Flex"
+node_count         = 1
+node_ocpus         = 1
+node_memory_in_gbs = 6
+node_pool_os_arch  = "aarch64"
+
+# Optional override if you want to pin a specific regional OKE image OCID.
+# node_image_id = "ocid1.image.oc1.eu-frankfurt-1..."
+
+# Access
+ssh_public_key = "ssh-ed25519 AAAA..."
+bastion_client_cidrs = ["203.0.113.10/32"]
+
+# Optional. Defaults to the whole VCN, which allows future in-VCN runners
+# to reach the private API endpoint without reopening the stack.
+# api_allowed_cidrs = ["10.0.0.0/16"]

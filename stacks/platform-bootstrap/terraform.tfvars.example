@@ -1,0 +1,14 @@
+# This stack must run from inside the VCN or another private path with access to the OKE API.
+
+cluster_name = "oracle-oke-free"
+
+# Example kubeconfig path for the private execution environment.
+kubeconfig_path = "~/.kube/config"
+
+# Argo CD
+argocd_namespace = "argocd"
+
+# ingress-nginx
+ingress_namespace = "ingress-nginx"
+
+# OCI-specific service annotations for NLB should be defined in this stack's Helm values.

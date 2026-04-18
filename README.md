@@ -1,21 +1,20 @@
 # oracle-tf
 
-Terraform layout for a small, professional OCI OKE platform on Free Tier.
+Terraform layout for a small OCI OKE platform on Free Tier. The cluster may be
+small, but we try our best to follow practices to have a professional setup.
 
-## Target Design
+## Design
 
 - Private OKE API endpoint
 - `BASIC_CLUSTER` to avoid enhanced OKE control plane charges
-- Single Ampere worker node to start
-- `VM.Standard.A1.Flex` with `1` OCPU and `6` GB RAM
-- `ingress-nginx` exposed through an OCI Network Load Balancer
+- `VM.Standard.A1.Flex` with `1` OCPU and `6` GB RAM, 1 node only for now
+- `ingress-nginx` exposed through an OCI Network Load Balancer to expose
+services
 - Argo CD bootstrapped from inside the VCN after cluster creation
-
-If you already created an `ENHANCED_CLUSTER`, switching to `BASIC_CLUSTER` requires replacing the cluster.
 
 ## Stack Strategy
 
-This repository should be split into two Terraform stacks plus a bootstrap path:
+This repository is split into two Terraform stacks plus a bootstrap path:
 
 1. `stacks/infra-free-tier`
    Creates OCI infrastructure only: networking, bastion access path, and OKE.
@@ -94,7 +93,7 @@ oci os bucket create \
 
 ### 3. Create local backend config files
 
-Copy the committed examples:
+Duplicate the example variable files:
 
 ```bash
 cp stacks/infra-free-tier/backend.hcl.example stacks/infra-free-tier/backend.hcl
@@ -118,9 +117,23 @@ The stacks intentionally use different state keys:
 - OCI Object Storage does not provide DynamoDB-style state locking for the S3 backend, so avoid concurrent applies.
 - The `scripts/tf.sh` wrapper sets the AWS SDK checksum environment variables required for OCI Object Storage compatibility.
 
+## Infra Provisioning
+
+After configuring `stacks/infra-free-tier/backend.hcl` and `stacks/infra-free-tier/terraform.tfvars`, create the OCI networking, Bastion, and OKE cluster from your normal workstation:
+
+```bash
+cd stacks/infra-free-tier
+../../scripts/tf.sh init
+../../scripts/tf.sh plan
+../../scripts/tf.sh apply
+```
+
+Once apply completes, continue with the Bastion workflow below to reach the private OKE API.
+
 ## Bastion Access
 
-Use OCI Bastion port forwarding to reach the private OKE API from your laptop.
+Use OCI Bastion port forwarding to reach the private OKE API from your
+workstation.
 
 ### 1. Open the local tunnel
 
@@ -199,9 +212,9 @@ After the Bastion tunnel is up and `KUBECONFIG` is exported, bootstrap the clust
 
 ```bash
 cd stacks/platform-bootstrap
-terraform init
-terraform plan
-terraform apply
+../../scripts/tf.sh init
+../../scripts/tf.sh plan
+../../scripts/tf.sh apply
 ```
 
 This stack installs:
@@ -240,8 +253,6 @@ Use username `admin` and the password retrieved from the initial admin secret.
 
 ## Argo CD GitOps Bootstrap
 
-The recommended pattern is:
-
 1. Terraform installs Argo CD.
 2. Terraform creates one root Argo CD `Application`.
 3. Argo CD reads the private Git repository and applies the child `Application` manifests stored there.
@@ -266,7 +277,6 @@ After `terraform apply`, verify bootstrap with:
 
 ```bash
 kubectl -n argocd get applications
-argocd app list
 ```
 
 The root application should appear first, then the child applications from `cluster-gitops/argocd/` should be created by Argo CD.

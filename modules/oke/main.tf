@@ -63,11 +63,6 @@ resource "oci_containerengine_node_pool" "this" {
   ssh_public_key      = var.ssh_public_key
   freeform_tags       = var.freeform_tags
 
-  initial_node_labels {
-    key   = "node-role.kubernetes.io/worker"
-    value = "true"
-  }
-
   node_config_details {
     size    = var.node_count
     nsg_ids = [var.worker_nsg_id]

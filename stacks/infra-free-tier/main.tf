@@ -52,3 +52,21 @@ module "bastion" {
   max_session_ttl_in_seconds     = var.bastion_max_session_ttl_in_seconds
   freeform_tags                  = local.common_tags
 }
+
+resource "oci_identity_dynamic_group" "run_command" {
+  count = var.enable_run_command ? 1 : 0
+
+  compartment_id = var.tenancy_ocid
+  name           = local.run_command_dynamic_group_name
+  description    = "Allows instances in the ${var.environment} compartment to consume OCI Run Command jobs."
+  matching_rule  = "All {instance.compartment.id = '${var.compartment_ocid}'}"
+}
+
+resource "oci_identity_policy" "run_command" {
+  count = var.enable_run_command ? 1 : 0
+
+  compartment_id = var.tenancy_ocid
+  name           = local.run_command_policy_name
+  description    = "Allows instances in the ${var.environment} compartment to execute OCI Run Command jobs."
+  statements     = local.run_command_policy_statements
+}

@@ -34,6 +34,7 @@ node_pool_os_arch  = "aarch64"
 # Access
 ssh_public_key = "ssh-ed25519 AAAA..."
 bastion_client_cidrs = ["203.0.113.10/32"]
+enable_run_command   = true
 
 # Optional. Defaults to the whole VCN, which allows future in-VCN runners
 # to reach the private API endpoint without reopening the stack.

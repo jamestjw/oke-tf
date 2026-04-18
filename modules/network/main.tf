@@ -300,6 +300,19 @@ resource "oci_core_network_security_group_security_rule" "endpoint_workers_path_
   }
 }
 
+resource "oci_core_network_security_group_security_rule" "endpoint_pods_path_discovery" {
+  network_security_group_id = oci_core_network_security_group.endpoint.id
+  direction                 = "INGRESS"
+  protocol                  = "1"
+  source                    = var.pod_subnet_cidr
+  source_type               = "CIDR_BLOCK"
+
+  icmp_options {
+    type = 3
+    code = 4
+  }
+}
+
 resource "oci_core_network_security_group_security_rule" "endpoint_egress" {
   network_security_group_id = oci_core_network_security_group.endpoint.id
   direction                 = "EGRESS"

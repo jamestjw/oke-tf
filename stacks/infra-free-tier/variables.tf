@@ -110,3 +110,8 @@ variable "bastion_max_session_ttl_in_seconds" {
   type    = number
   default = 10800
 }
+
+variable "enable_run_command" {
+  type    = bool
+  default = false
+}

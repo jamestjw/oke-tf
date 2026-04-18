@@ -84,7 +84,7 @@ resource "oci_core_security_list" "public" {
   }
 
   ingress_security_rules {
-    protocol = "6"
+    protocol = "6" # TCP
     source   = "0.0.0.0/0"
 
     tcp_options {
@@ -94,7 +94,7 @@ resource "oci_core_security_list" "public" {
   }
 
   ingress_security_rules {
-    protocol = "6"
+    protocol = "6" # TCP
     source   = "0.0.0.0/0"
 
     tcp_options {
@@ -107,7 +107,7 @@ resource "oci_core_security_list" "public" {
     for_each = toset(var.bastion_client_cidrs)
 
     content {
-      protocol = "6"
+      protocol = "6" # TCP
       source   = ingress_security_rules.value
 
       tcp_options {
@@ -215,7 +215,7 @@ resource "oci_core_network_security_group_security_rule" "endpoint_ingress" {
   for_each                  = toset(var.api_allowed_cidrs)
   network_security_group_id = oci_core_network_security_group.endpoint.id
   direction                 = "INGRESS"
-  protocol                  = "6"
+  protocol                  = "6" # TCP
   source                    = each.value
   source_type               = "CIDR_BLOCK"
 
@@ -230,7 +230,7 @@ resource "oci_core_network_security_group_security_rule" "endpoint_ingress" {
 resource "oci_core_network_security_group_security_rule" "endpoint_workers_k8s_api" {
   network_security_group_id = oci_core_network_security_group.endpoint.id
   direction                 = "INGRESS"
-  protocol                  = "6"
+  protocol                  = "6" # TCP
   source                    = var.worker_subnet_cidr
   source_type               = "CIDR_BLOCK"
 
@@ -245,7 +245,7 @@ resource "oci_core_network_security_group_security_rule" "endpoint_workers_k8s_a
 resource "oci_core_network_security_group_security_rule" "endpoint_workers_proxymux" {
   network_security_group_id = oci_core_network_security_group.endpoint.id
   direction                 = "INGRESS"
-  protocol                  = "6"
+  protocol                  = "6" # TCP
   source                    = var.worker_subnet_cidr
   source_type               = "CIDR_BLOCK"
 
@@ -260,7 +260,7 @@ resource "oci_core_network_security_group_security_rule" "endpoint_workers_proxy
 resource "oci_core_network_security_group_security_rule" "endpoint_pods_k8s_api" {
   network_security_group_id = oci_core_network_security_group.endpoint.id
   direction                 = "INGRESS"
-  protocol                  = "6"
+  protocol                  = "6" # TCP
   source                    = var.pod_subnet_cidr
   source_type               = "CIDR_BLOCK"
 
@@ -275,7 +275,7 @@ resource "oci_core_network_security_group_security_rule" "endpoint_pods_k8s_api"
 resource "oci_core_network_security_group_security_rule" "endpoint_pods_proxymux" {
   network_security_group_id = oci_core_network_security_group.endpoint.id
   direction                 = "INGRESS"
-  protocol                  = "6"
+  protocol                  = "6" # TCP
   source                    = var.pod_subnet_cidr
   source_type               = "CIDR_BLOCK"
 
@@ -343,7 +343,7 @@ resource "oci_core_network_security_group_security_rule" "pods_egress" {
 resource "oci_core_network_security_group_security_rule" "lb_ingress_http" {
   network_security_group_id = oci_core_network_security_group.load_balancers.id
   direction                 = "INGRESS"
-  protocol                  = "6"
+  protocol                  = "6" # TCP
   source                    = "0.0.0.0/0"
   source_type               = "CIDR_BLOCK"
 
@@ -358,7 +358,7 @@ resource "oci_core_network_security_group_security_rule" "lb_ingress_http" {
 resource "oci_core_network_security_group_security_rule" "lb_ingress_https" {
   network_security_group_id = oci_core_network_security_group.load_balancers.id
   direction                 = "INGRESS"
-  protocol                  = "6"
+  protocol                  = "6" # TCP
   source                    = "0.0.0.0/0"
   source_type               = "CIDR_BLOCK"
 

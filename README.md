@@ -161,6 +161,20 @@ terraform output argocd_admin_password_command
 
 Then run the printed command in a shell with `KUBECONFIG` exported.
 
+If `argocd_hostname` is left as `null`, Argo CD is not exposed through ingress. Access it locally with:
+
+```bash
+kubectl -n argocd port-forward svc/argocd-server 8080:80
+```
+
+Then open:
+
+```text
+http://127.0.0.1:8080
+```
+
+Use username `admin` and the password retrieved from the initial admin secret.
+
 ## Why This Is The Professional Split
 
 - Private control plane stays private.

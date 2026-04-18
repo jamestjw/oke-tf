@@ -135,6 +135,32 @@ kubectl get ns
 
 Once those commands work, you can run the `platform-bootstrap` stack from your laptop while the tunnel remains open.
 
+## Platform Bootstrap
+
+After the Bastion tunnel is up and `KUBECONFIG` is exported, bootstrap the cluster add-ons from `stacks/platform-bootstrap`:
+
+```bash
+cd stacks/platform-bootstrap
+terraform init
+terraform plan
+terraform apply
+```
+
+This stack installs:
+
+- `ingress-nginx` via Helm
+- `argocd` via Helm
+
+The default ingress controller service is configured to request an OCI Network Load Balancer.
+
+After apply, get the initial Argo CD admin password with:
+
+```bash
+terraform output argocd_admin_password_command
+```
+
+Then run the printed command in a shell with `KUBECONFIG` exported.
+
 ## Why This Is The Professional Split
 
 - Private control plane stays private.

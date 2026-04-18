@@ -109,11 +109,10 @@ MAX_RETRIES="${MAX_RETRIES:-5}"
 RETRY_DELAY_SECONDS="${RETRY_DELAY_SECONDS:-3}"
 
 for attempt in $(seq 1 "${MAX_RETRIES}"); do
-  ssh "${SSH_ARGS[@]}"
-  ssh_exit_code=$?
-
-  if [[ "${ssh_exit_code}" -eq 0 ]]; then
+  if ssh "${SSH_ARGS[@]}"; then
     exit 0
+  else
+    ssh_exit_code=$?
   fi
 
   if [[ "${ssh_exit_code}" -eq 130 ]]; then

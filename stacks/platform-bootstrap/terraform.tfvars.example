@@ -1,14 +1,14 @@
-# This stack must run from inside the VCN or another private path with access to the OKE API.
+# This stack must run from a shell that can reach the private OKE API.
+# The recommended path is the Bastion tunnel helper in scripts/open-oke-api-tunnel.sh.
 
-cluster_name = "oracle-oke-free"
-
-# Example kubeconfig path for the private execution environment.
-kubeconfig_path = "~/.kube/config"
+# Dedicated kubeconfig prepared by scripts/open-oke-api-tunnel.sh
+kubeconfig_path = "~/.kube/oracle-oke-free.yaml"
 
 # Argo CD
 argocd_namespace = "argocd"
+argocd_hostname  = "argocd.example.com"
 
 # ingress-nginx
 ingress_namespace = "ingress-nginx"
 
-# OCI-specific service annotations for NLB should be defined in this stack's Helm values.
+# OCI-specific NLB annotations are defined by default in variables.tf.

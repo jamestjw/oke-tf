@@ -26,3 +26,4 @@ crash.*.log
 # Local CLI configuration
 .terraformrc
 terraform.rc
+/stacks/*/backend.hcl

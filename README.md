@@ -5,10 +5,13 @@ Terraform layout for a small, professional OCI OKE platform on Free Tier.
 ## Target Design
 
 - Private OKE API endpoint
+- `BASIC_CLUSTER` to avoid enhanced OKE control plane charges
 - Single Ampere worker node to start
 - `VM.Standard.A1.Flex` with `1` OCPU and `6` GB RAM
 - `ingress-nginx` exposed through an OCI Network Load Balancer
 - Argo CD bootstrapped from inside the VCN after cluster creation
+
+If you already created an `ENHANCED_CLUSTER`, switching to `BASIC_CLUSTER` requires replacing the cluster.
 
 ## Stack Strategy
 

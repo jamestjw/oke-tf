@@ -12,7 +12,7 @@ variable "cluster_name" {
 
 variable "cluster_type" {
   type    = string
-  default = "ENHANCED_CLUSTER"
+  default = "BASIC_CLUSTER"
 }
 
 variable "kubernetes_version" {

@@ -33,7 +33,7 @@ variable "kubernetes_version" {
 
 variable "cluster_type" {
   type    = string
-  default = "ENHANCED_CLUSTER"
+  default = "BASIC_CLUSTER"
 }
 
 variable "vcn_cidr" {

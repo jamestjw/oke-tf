@@ -13,6 +13,7 @@ environment  = "free"
 # Cluster
 cluster_name        = "oracle-oke-free"
 kubernetes_version  = "v1.30.1"
+cluster_type        = "BASIC_CLUSTER"
 
 # Networking
 vcn_cidr             = "10.0.0.0/16"

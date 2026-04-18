@@ -1,7 +1,7 @@
 # oracle-tf
 
 Terraform layout for a small OCI OKE platform on Free Tier. The cluster may be
-small, but we try our best to follow practices to have a professional setup.
+small, but we try our best to follow best practices to have a professional setup.
 
 ## Design
 
@@ -11,6 +11,12 @@ small, but we try our best to follow practices to have a professional setup.
 - `ingress-nginx` exposed through an OCI Network Load Balancer to expose
 services
 - Argo CD bootstrapped from inside the VCN after cluster creation
+
+## Prerequisites
+
+- Install Terraform: <https://developer.hashicorp.com/terraform/install>
+- Install the OCI CLI: <https://docs.oracle.com/en-us/iaas/Content/API/SDKDocs/cliinstall.htm>
+- Authenticate the OCI CLI locally before running the Terraform stacks, Bastion helper, or kubeconfig generation steps.
 
 ## Stack Strategy
 

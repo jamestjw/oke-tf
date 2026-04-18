@@ -60,6 +60,81 @@ oracle-tf/
 3. Run `stacks/platform-bootstrap` from that private execution environment.
 4. Let Argo CD take ownership of application and add-on manifests after bootstrap.
 
+## Bastion Access
+
+Use OCI Bastion port forwarding to reach the private OKE API from your laptop.
+
+### 1. Open the local tunnel
+
+Use the helper script in `scripts/open-oke-api-tunnel.sh`.
+
+By default it fetches these values from `stacks/infra-free-tier` Terraform outputs:
+
+- `bastion_id`
+- `oke_private_endpoint`
+
+It will:
+
+1. create an OCI Bastion port-forward session if `BASTION_SESSION_ID` is not already set
+2. wait for the session to become `ACTIVE`
+3. create a dedicated kubeconfig for the cluster
+4. point that kubeconfig at the local tunnel
+5. open the SSH tunnel to the private OKE API endpoint
+
+Example:
+
+```bash
+chmod +x scripts/open-oke-api-tunnel.sh
+
+SSH_PRIVATE_KEY="$HOME/.ssh/id_ed25519" \
+LOCAL_PORT=16443 \
+OCI_REGION="ca-montreal-1" \
+./scripts/open-oke-api-tunnel.sh
+```
+
+By default the script writes a dedicated kubeconfig to:
+
+```bash
+$HOME/.kube/oracle-oke-free.yaml
+```
+
+You can override that path:
+
+```bash
+KUBECONFIG_PATH="$HOME/.kube/my-oke.yaml" ./scripts/open-oke-api-tunnel.sh
+```
+
+If you want to override the Terraform stack path:
+
+```bash
+TF_STACK_DIR="$PWD/stacks/infra-free-tier" ./scripts/open-oke-api-tunnel.sh
+```
+
+If you already created a Bastion session and want to reuse it:
+
+```bash
+BASTION_SESSION_ID="<bastion-session-ocid>" ./scripts/open-oke-api-tunnel.sh
+```
+
+Keep that terminal open while using `kubectl`, Helm, or Terraform against the private cluster API.
+
+### 2. Export kubeconfig in another terminal
+
+The script prepares the dedicated kubeconfig for you. In a separate terminal:
+
+```bash
+export KUBECONFIG="$HOME/.kube/oracle-oke-free.yaml"
+```
+
+### 3. Verify access
+
+```bash
+kubectl get nodes
+kubectl get ns
+```
+
+Once those commands work, you can run the `platform-bootstrap` stack from your laptop while the tunnel remains open.
+
 ## Why This Is The Professional Split
 
 - Private control plane stays private.

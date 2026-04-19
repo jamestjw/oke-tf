@@ -216,6 +216,8 @@ BASTION_SESSION_ID="<bastion-session-ocid>" ./scripts/open-oke-api-tunnel.sh
 
 Keep that terminal open while using `kubectl`, Helm, or Terraform against the private cluster API.
 
+If the OCI Bastion session expires, the tunnel script will exit and ask you to re-run it. That is expected; just create a new session and reopen the tunnel.
+
 ### 2. Export kubeconfig in another terminal
 
 The script prepares the dedicated kubeconfig for you. In a separate terminal:

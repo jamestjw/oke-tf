@@ -14,6 +14,16 @@ terraform_output() {
   terraform -chdir="${TF_STACK_DIR}" output -raw "$1"
 }
 
+bastion_session_state() {
+  local state
+
+  if state="$(oci bastion session get --session-id "${BASTION_SESSION_ID}" --query 'data."lifecycle-state"' --raw-output 2>/dev/null)"; then
+    printf '%s\n' "${state}"
+  else
+    printf 'NOT_FOUND\n'
+  fi
+}
+
 if [[ -z "${BASTION_ID:-}" ]]; then
   BASTION_ID="$(terraform_output bastion_id)"
 fi
@@ -53,7 +63,7 @@ if [[ -z "${BASTION_SESSION_ID:-}" ]]; then
   })"
 
   while true; do
-    SESSION_STATE="$(oci bastion session get --session-id "${BASTION_SESSION_ID}" --query 'data."lifecycle-state"' --raw-output)"
+    SESSION_STATE="$(bastion_session_state)"
 
     if [[ "${SESSION_STATE}" == "ACTIVE" ]]; then
       break
@@ -100,6 +110,7 @@ printf 'Forwarding 127.0.0.1:%s to %s:%s through Bastion session %s\n' \
 SSH_ARGS=(
   -S none
   -o ControlMaster=no
+  -o BatchMode=yes
   -o IdentitiesOnly=yes
   -i "${SSH_PRIVATE_KEY}"
   -N
@@ -123,6 +134,22 @@ for attempt in $(seq 1 "${MAX_RETRIES}"); do
     exit 130
   fi
 
+  SESSION_STATE="$(bastion_session_state)"
+
+  if [[ "${SESSION_STATE}" == "DELETED" || "${SESSION_STATE}" == "NOT_FOUND" ]]; then
+    printf 'Bastion session %s is no longer active. This usually means it expired, which is expected for OCI Bastion sessions.\n' \
+      "${BASTION_SESSION_ID}"
+    printf 'Re-run scripts/open-oke-api-tunnel.sh to create a new session and reopen the tunnel.\n'
+    exit 0
+  fi
+
+  if [[ "${SESSION_STATE}" != "ACTIVE" ]]; then
+    printf 'Bastion session %s is in state %s, so the tunnel cannot stay open.\n' \
+      "${BASTION_SESSION_ID}" \
+      "${SESSION_STATE}" >&2
+    exit 1
+  fi
+
   if [[ "${attempt}" -lt "${MAX_RETRIES}" ]]; then
     printf 'SSH tunnel attempt %s/%s failed, retrying in %s seconds...\n' \
       "${attempt}" \
@@ -132,5 +159,14 @@ for attempt in $(seq 1 "${MAX_RETRIES}"); do
   fi
 done
 
-printf 'SSH tunnel failed after %s attempts\n' "${MAX_RETRIES}" >&2
+SESSION_STATE="$(bastion_session_state)"
+
+if [[ "${SESSION_STATE}" == "ACTIVE" ]]; then
+  printf 'SSH tunnel failed after %s attempts while the Bastion session remained ACTIVE. Check that SSH_PRIVATE_KEY matches the public key used for the Bastion session.\n' "${MAX_RETRIES}" >&2
+else
+  printf 'SSH tunnel ended because Bastion session %s is in state %s. Re-run the script to create a new session.\n' \
+    "${BASTION_SESSION_ID}" \
+    "${SESSION_STATE}"
+fi
+
 exit 1

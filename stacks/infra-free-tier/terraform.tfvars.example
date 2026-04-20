@@ -25,8 +25,8 @@ lb_subnet_cidr       = "10.0.3.0/24"
 # Node pool
 node_shape         = "VM.Standard.A1.Flex"
 node_count         = 1
-node_ocpus         = 1
-node_memory_in_gbs = 6
+node_ocpus         = 4
+node_memory_in_gbs = 24
 node_pool_os_arch  = "aarch64"
 
 # Optional override if you want to pin a specific regional OKE image OCID.

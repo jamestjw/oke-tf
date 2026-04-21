@@ -276,7 +276,10 @@ resource "kubernetes_secret_v1" "argocd_repository" {
     }
   }
 
-  depends_on = [helm_release.argocd]
+  depends_on = [
+    helm_release.argocd,
+    helm_release.nfs_provisioner
+  ]
 }
 
 resource "kubernetes_manifest" "argocd_root_application" {
@@ -312,5 +315,6 @@ resource "kubernetes_manifest" "argocd_root_application" {
   depends_on = [
     helm_release.argocd,
     kubernetes_secret_v1.argocd_repository,
+    helm_release.nfs_provisioner
   ]
 }

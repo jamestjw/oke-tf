@@ -86,3 +86,27 @@ variable "argocd_root_application_revision" {
   type    = string
   default = "main"
 }
+
+variable "nfs_provisioner_enabled" {
+  type        = bool
+  default     = true
+  description = "Enable the NFS subdir external provisioner to carve up a single OCI Block Volume."
+}
+
+variable "nfs_provisioner_namespace" {
+  type        = string
+  default     = "storage"
+  description = "Namespace for the NFS storage provisioner and server."
+}
+
+variable "nfs_storage_size" {
+  type        = string
+  default     = "50Gi"
+  description = "Size of the backing OCI Block Volume for the NFS provisioner."
+}
+
+variable "nfs_provisioner_chart_version" {
+  type        = string
+  default     = "4.0.18"
+  description = "Helm chart version for nfs-subdir-external-provisioner."
+}

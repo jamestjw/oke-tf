@@ -92,6 +92,9 @@ resource "kubernetes_service" "nfs_server" {
       name = "nfs"
       port = 2049
     }
+    
+    # Use a Headless Service to bypass kube-proxy load balancing.
+    # This provides a more stable, direct connection for long-lived stateful NFS traffic.
     cluster_ip = "None"
   }
 }

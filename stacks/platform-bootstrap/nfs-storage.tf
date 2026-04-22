@@ -47,7 +47,7 @@ resource "kubernetes_deployment" "nfs_server" {
       spec {
         container {
           name  = "nfs-server"
-          image = "erichough/nfs-server:latest"
+          image = "erichough/nfs-server:2.2.1"
           env {
             name  = "NFS_EXPORT_0"
             value = "/exports *(rw,fsid=0,insecure,no_root_squash,no_subtree_check,sync)"

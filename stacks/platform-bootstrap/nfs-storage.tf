@@ -129,6 +129,11 @@ resource "helm_release" "nfs_provisioner" {
     value = "true"
   }
 
+  set {
+    name  = "storageClass.archiveOnDelete"
+    value = "false"
+  }
+
   depends_on = [
     kubernetes_deployment.nfs_server,
     kubernetes_service.nfs_server

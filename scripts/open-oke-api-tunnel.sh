@@ -9,6 +9,7 @@ LOCAL_PORT="${LOCAL_PORT:-16443}"
 OCI_REGION="${OCI_REGION:-ca-montreal-1}"
 KUBECONFIG_PATH="${KUBECONFIG_PATH:-$HOME/.kube/oracle-oke-free.yaml}"
 SETUP_KUBECONFIG="${SETUP_KUBECONFIG:-true}"
+BASTION_SESSION_TTL="${BASTION_SESSION_TTL:-1800}"
 
 terraform_output() {
   terraform -chdir="${TF_STACK_DIR}" output -raw "$1"
@@ -55,6 +56,7 @@ if [[ -z "${BASTION_SESSION_ID:-}" ]]; then
       --bastion-id "${BASTION_ID}" \
       --target-private-ip "${OKE_API_HOST}" \
       --target-port "${OKE_API_PORT}" \
+      --session-ttl "${BASTION_SESSION_TTL}" \
       --ssh-public-key-file "${SSH_PUBLIC_KEY}" \
       --key-type PUB \
       --display-name "oke-api-port-forward" \

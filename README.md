@@ -250,6 +250,7 @@ cd stacks/platform-bootstrap
 This stack installs:
 
 - `ingress-nginx` via Helm
+- `cert-manager` via Helm
 - `argocd` via Helm
 
 If `argocd_bootstrap_enabled = true`, Terraform also bootstraps Argo CD against your GitOps repository by creating:
@@ -258,6 +259,15 @@ If `argocd_bootstrap_enabled = true`, Terraform also bootstraps Argo CD against 
 - a root Argo CD `Application` that points at the directory containing child `Application` manifests
 
 The default ingress controller service is configured to request an OCI Network Load Balancer.
+
+If `cert_manager_acme_email`, `cert_manager_dns_zone`, and `cloudflare_api_token` are set, this stack also configures:
+
+- a Cloudflare-backed `ClusterIssuer` for Let's Encrypt staging
+- a Cloudflare-backed `ClusterIssuer` for Let's Encrypt production
+- a wildcard `Certificate` for `<zone>` and `*.<zone>` in the `ingress-nginx` namespace
+- `ingress-nginx` to serve that wildcard certificate as the controller-wide default TLS certificate
+
+If `cloudflare_argocd_dns_record_enabled = true`, Terraform also creates a Cloudflare DNS record for `argocd_hostname` that points at the external `ingress-nginx` load balancer. If `cloudflare_wildcard_dns_record_enabled = true`, Terraform also creates `*.<zone>` against that same target.
 
 After apply, get the initial Argo CD admin password with:
 
@@ -280,6 +290,10 @@ http://127.0.0.1:8080
 ```
 
 Use username `admin` and the password retrieved from the initial admin secret.
+
+If `argocd_hostname` is set and the wildcard certificate is enabled, NGINX will terminate TLS with the shared wildcard certificate. Create a DNS record in Cloudflare that points `argocd.<zone>` at the public ingress load balancer.
+
+With Cloudflare DNS automation enabled, Terraform manages that record directly.
 
 ## Argo CD GitOps Bootstrap
 
@@ -310,6 +324,19 @@ kubectl -n argocd get applications
 ```
 
 The root application should appear first, then the child applications from `cluster-gitops/argocd/` should be created by Argo CD.
+
+## Public App TLS
+
+The bootstrap stack can issue and serve a shared wildcard certificate through `ingress-nginx`. With that in place, each application in `cluster-gitops` can keep owning its own `Ingress` resource while reusing the shared certificate at the controller layer.
+
+For app ingresses under the wildcard zone:
+
+- set `spec.ingressClassName: nginx`
+- set a unique `spec.rules[].host`
+- include a `spec.tls` entry for the host if you want ingress-level TLS intent and redirects
+- do not reference the shared wildcard secret from another namespace, because ingress TLS secrets are namespaced
+
+If an app needs its own certificate instead of the shared wildcard certificate, create a namespace-local `Certificate` for that app and reference its secret from that app's `Ingress`.
 
 # Architecture
 See `docs/architecture.md` for the detailed design.

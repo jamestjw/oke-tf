@@ -1,0 +1,6 @@
+apiVersion: v2
+name: platform-bootstrap-acme
+description: ACME issuers and wildcard certificate for platform bootstrap
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

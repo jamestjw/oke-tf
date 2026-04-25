@@ -1,0 +1,17 @@
+certManager:
+  clusterIssuerStagingName: letsencrypt-staging
+  clusterIssuerProdName: letsencrypt-prod
+  acmeEmail: ""
+  stagingServer: https://acme-staging-v02.api.letsencrypt.org/directory
+  prodServer: https://acme-v02.api.letsencrypt.org/directory
+  dnsZone: ""
+  cloudflare:
+    apiTokenSecretName: cloudflare-api-token
+    apiTokenSecretKey: api-token
+
+ingress:
+  namespace: ingress-nginx
+  wildcardCertificate:
+    enabled: true
+    name: ingress-default-wildcard
+    secretName: ingress-default-wildcard-tls

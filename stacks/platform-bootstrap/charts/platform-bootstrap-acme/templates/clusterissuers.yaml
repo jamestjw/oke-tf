@@ -1,0 +1,36 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: {{ .Values.certManager.clusterIssuerStagingName }}
+spec:
+  acme:
+    email: {{ .Values.certManager.acmeEmail | quote }}
+    server: {{ .Values.certManager.stagingServer | quote }}
+    privateKeySecretRef:
+      name: {{ printf "%s-account-key" .Values.certManager.clusterIssuerStagingName }}
+    solvers:
+      - dns01:
+          cloudflare:
+            apiTokenSecretRef:
+              name: {{ .Values.certManager.cloudflare.apiTokenSecretName }}
+              key: {{ .Values.certManager.cloudflare.apiTokenSecretKey }}
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: {{ .Values.certManager.clusterIssuerProdName }}
+spec:
+  acme:
+    email: {{ .Values.certManager.acmeEmail | quote }}
+    server: {{ .Values.certManager.prodServer | quote }}
+    privateKeySecretRef:
+      name: {{ printf "%s-account-key" .Values.certManager.clusterIssuerProdName }}
+    solvers:
+      - selector:
+          dnsZones:
+            - {{ .Values.certManager.dnsZone | quote }}
+        dns01:
+          cloudflare:
+            apiTokenSecretRef:
+              name: {{ .Values.certManager.cloudflare.apiTokenSecretName }}
+              key: {{ .Values.certManager.cloudflare.apiTokenSecretKey }}

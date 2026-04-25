@@ -25,4 +25,18 @@ argocd_root_application_revision = "main"
 # ingress-nginx
 ingress_namespace = "ingress-nginx"
 
+# cert-manager / ACME DNS-01 via Cloudflare
+cert_manager_namespace                  = "cert-manager"
+cert_manager_cluster_resource_namespace = "cert-manager"
+cert_manager_acme_email                 = "you@example.com"
+cert_manager_dns_zone                   = "example.com"
+cloudflare_api_token                    = "replace-with-cloudflare-dns-edit-token"
+cloudflare_zone_name                    = "example.com"
+cloudflare_argocd_dns_record_enabled    = true
+cloudflare_wildcard_dns_record_enabled  = false
+cloudflare_dns_record_proxied           = false
+
+# Shared default wildcard certificate served by ingress-nginx.
+ingress_default_wildcard_certificate_enabled = true
+
 # OCI-specific NLB annotations are defined by default in variables.tf.

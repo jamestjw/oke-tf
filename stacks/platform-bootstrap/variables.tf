@@ -186,7 +186,7 @@ variable "argocd_root_application_revision" {
 
 variable "nfs_provisioner_enabled" {
   type        = bool
-  default     = true
+  default     = false
   description = "Enable the NFS subdir external provisioner to carve up a single OCI Block Volume."
 }
 

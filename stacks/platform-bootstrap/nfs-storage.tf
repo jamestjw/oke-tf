@@ -7,6 +7,7 @@ resource "kubernetes_namespace" "nfs_provisioner" {
 
 resource "kubernetes_persistent_volume_claim" "nfs_master_pvc" {
   count = var.nfs_provisioner_enabled ? 1 : 0
+  wait_until_bound = false
   metadata {
     name      = "nfs-master-pvc"
     namespace = kubernetes_namespace.nfs_provisioner[0].metadata[0].name
@@ -47,7 +48,8 @@ resource "kubernetes_deployment" "nfs_server" {
       spec {
         container {
           name  = "nfs-server"
-          image = "erichough/nfs-server:2.2.1"
+          # The original erichough image is amd64-only; use an arm64-compatible fork for OCI Ampere nodes.
+          image = var.nfs_server_image
           env {
             name  = "NFS_EXPORT_0"
             value = "/exports *(rw,fsid=0,insecure,no_root_squash,no_subtree_check,sync)"

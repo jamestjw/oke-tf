@@ -207,3 +207,9 @@ variable "nfs_provisioner_chart_version" {
   default     = "4.0.18"
   description = "Helm chart version for nfs-subdir-external-provisioner."
 }
+
+variable "nfs_server_image" {
+  type        = string
+  default     = "docker.io/andrewkidd/nfs-server:v2.2.7"
+  description = "Container image for the in-cluster NFS server backing the provisioner."
+}

@@ -103,7 +103,12 @@ variable "cloudflare_wildcard_dns_record_enabled" {
   default = false
 }
 
-variable "cloudflare_dns_record_proxied" {
+variable "cloudflare_argocd_dns_record_proxied" {
+  type    = bool
+  default = true
+}
+
+variable "cloudflare_wildcard_dns_record_proxied" {
   type    = bool
   default = false
 }

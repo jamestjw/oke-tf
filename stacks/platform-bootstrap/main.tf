@@ -91,7 +91,7 @@ resource "cloudflare_record" "argocd" {
   name    = local.cloudflare_argocd_record_name
   type    = local.ingress_external_record_type
   content = local.ingress_external_record_value
-  proxied = var.cloudflare_dns_record_proxied
+  proxied = var.cloudflare_argocd_dns_record_proxied
 
   allow_overwrite = true
 }
@@ -103,7 +103,7 @@ resource "cloudflare_record" "wildcard" {
   name    = local.cloudflare_wildcard_record_name
   type    = local.ingress_external_record_type
   content = local.ingress_external_record_value
-  proxied = var.cloudflare_dns_record_proxied
+  proxied = var.cloudflare_wildcard_dns_record_proxied
 
   allow_overwrite = true
 }

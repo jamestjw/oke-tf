@@ -157,6 +157,63 @@ cd stacks/infra-free-tier
 
 Once apply completes, continue with the Bastion workflow below to reach the private OKE API.
 
+## OKE Kubernetes Version Upgrade
+
+The Kubernetes version for the OKE control plane and node pool is managed from `stacks/infra-free-tier/terraform.tfvars`:
+
+```hcl
+kubernetes_version = "v1.35.2"
+```
+
+Before upgrading, confirm the target version is available for OKE in the configured OCI region.
+
+Run the upgrade from the infra stack:
+
+```bash
+cd stacks/infra-free-tier
+../../scripts/tf.sh plan
+```
+
+Upgrade the control plane first:
+
+```bash
+../../scripts/tf.sh apply -target=module.oke.oci_containerengine_cluster.this
+```
+
+Then update the node pool version in Terraform:
+
+```bash
+../../scripts/tf.sh apply -target=module.oke.oci_containerengine_node_pool.this
+```
+
+After the node pool version has been updated, manually cycle the node from the OCI Console:
+
+```text
+OCI Console
+-> Kubernetes Clusters
+-> oracle-oke-free
+-> Node pools
+-> worker node pool
+-> Cycle nodes
+```
+
+Individual worker nodes are not managed as separate Terraform resources in this repository. Terraform manages the OKE node pool, and OCI manages the compute instances behind that node pool.
+
+Do not cycle nodes before Terraform updates the node pool version. Otherwise, OCI may recreate a node on the old Kubernetes version.
+
+With `node_count = 1`, cycling the node can cause workload downtime unless the workloads tolerate losing the only worker node.
+
+Verify the replacement node through the Bastion tunnel:
+
+```bash
+export KUBECONFIG="$HOME/.kube/oracle-oke-free.yaml"
+kubectl get nodes -o wide
+kubectl get pods -A -o wide
+kubectl version
+```
+
+Avoid concurrent applies. OCI Object Storage does not provide DynamoDB-style state locking for the S3 backend.
+
 ## Bastion Access
 
 Use OCI Bastion port forwarding to reach the private OKE API from your

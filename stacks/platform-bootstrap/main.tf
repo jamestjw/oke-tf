@@ -1,4 +1,11 @@
 locals {
+  ingress_controller_config = {
+    enable-real-ip        = "true"
+    forwarded-for-header  = "CF-Connecting-IP"
+    proxy-real-ip-cidr    = join(",", data.cloudflare_ip_ranges.cloudflare.cidr_blocks)
+    use-forwarded-headers = "true"
+  }
+
   cert_manager_acme_enabled = alltrue([
     var.cert_manager_acme_email != null && trimspace(var.cert_manager_acme_email) != "",
     var.cert_manager_dns_zone != null && trimspace(var.cert_manager_dns_zone) != "",
@@ -9,6 +16,8 @@ locals {
 
   cloudflare_zone_name = coalesce(var.cloudflare_zone_name, var.cert_manager_dns_zone)
 }
+
+data "cloudflare_ip_ranges" "cloudflare" {}
 
 resource "kubernetes_namespace" "ingress_nginx" {
   metadata {
@@ -41,6 +50,7 @@ resource "helm_release" "ingress_nginx" {
   values = [
     yamlencode({
       controller = merge({
+        config = local.ingress_controller_config
         service = {
           type                  = "LoadBalancer"
           externalTrafficPolicy = var.ingress_service_external_traffic_policy

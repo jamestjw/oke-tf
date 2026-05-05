@@ -329,6 +329,22 @@ resource "oci_core_network_security_group_security_rule" "workers_ingress_vcn" {
   source_type               = "CIDR_BLOCK"
 }
 
+resource "oci_core_network_security_group_security_rule" "workers_ingress_preserved_source_nodeports" {
+  for_each                  = toset(var.preserved_source_nodeport_cidrs)
+  network_security_group_id = oci_core_network_security_group.workers.id
+  direction                 = "INGRESS"
+  protocol                  = "6" # TCP
+  source                    = each.value
+  source_type               = "CIDR_BLOCK"
+
+  tcp_options {
+    destination_port_range {
+      min = 30000
+      max = 32767
+    }
+  }
+}
+
 resource "oci_core_network_security_group_security_rule" "workers_egress" {
   network_security_group_id = oci_core_network_security_group.workers.id
   direction                 = "EGRESS"

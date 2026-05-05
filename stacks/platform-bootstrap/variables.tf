@@ -43,7 +43,7 @@ variable "ingress_service_annotations" {
     "oci.oraclecloud.com/load-balancer-type"                                  = "nlb"
     "oci.oraclecloud.com/security-rule-management-mode"                       = "None"
     "oci-network-load-balancer.oraclecloud.com/security-list-management-mode" = "None"
-    "oci-network-load-balancer.oraclecloud.com/is-preserve-source"            = "false"
+    "oci-network-load-balancer.oraclecloud.com/is-preserve-source"            = "true"
   }
 }
 

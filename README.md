@@ -317,6 +317,12 @@ If `argocd_bootstrap_enabled = true`, Terraform also bootstraps Argo CD against 
 
 The default ingress controller service is configured to request an OCI Network Load Balancer.
 
+For Cloudflare-proxied traffic, the platform stack configures `ingress-nginx` to use Cloudflare's `CF-Connecting-IP` header as the real client IP. The Cloudflare CIDR list is read dynamically with `data "cloudflare_ip_ranges" "cloudflare" {}` and passed to `proxy-real-ip-cidr`, so ingress-nginx only trusts that header when the direct source is Cloudflare.
+
+The infra stack also reads the Cloudflare IPv4 CIDRs dynamically and allows those ranges to reach worker NodePorts. This is required because OCI NLB source preservation makes worker nodes see the Cloudflare edge IP as the packet source instead of an internal VCN source.
+
+When changing this configuration, apply `stacks/infra-free-tier` before `stacks/platform-bootstrap`. That opens the worker NodePort security rules before enabling or updating NLB source preservation, avoiding Cloudflare `522` timeouts during rollout.
+
 If `cert_manager_acme_email`, `cert_manager_dns_zone`, and `cloudflare_api_token` are set, this stack also configures:
 
 - a Cloudflare-backed `ClusterIssuer` for Let's Encrypt staging

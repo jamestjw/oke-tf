@@ -34,6 +34,11 @@ variable "bastion_client_cidrs" {
   type = list(string)
 }
 
+variable "preserved_source_nodeport_cidrs" {
+  type    = list(string)
+  default = []
+}
+
 variable "freeform_tags" {
   type    = map(string)
   default = {}

@@ -204,6 +204,9 @@ resource "helm_release" "argocd" {
         domain = var.argocd_hostname
       }
       configs = {
+        cm = {
+          "exec.enabled" = true
+        }
         params = {
           "server.insecure" = tostring(var.argocd_server_insecure)
         }

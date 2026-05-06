@@ -24,7 +24,7 @@ variable "ingress_controller_service_name" {
 
 variable "argocd_chart_version" {
   type    = string
-  default = "7.7.16"
+  default = "9.5.11"
 }
 
 variable "cert_manager_namespace" {

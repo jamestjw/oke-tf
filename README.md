@@ -358,6 +358,32 @@ If `argocd_hostname` is set and the wildcard certificate is enabled, NGINX will 
 
 With Cloudflare DNS automation enabled, Terraform manages that record directly.
 
+### Optional Tailscale Exit Node
+
+The platform stack can run a Tailscale exit node on the existing OKE worker
+node. This does not create any additional OCI compute resources.
+
+Before enabling it, create a Tailscale auth key with:
+
+- `tag:exit-node`
+- reusable enabled
+- pre-authorized enabled
+- ephemeral disabled
+
+The tailnet access policy should allow `tag:exit-node` to auto-approve exit-node advertisements.
+
+Enable the add-on in `stacks/platform-bootstrap/terraform.tfvars`:
+
+```hcl
+enable_tailscale_exit_node   = true
+tailscale_auth_key           = "tskey-auth-..."
+tailscale_exit_node_hostname = "oci-oke-exit-node"
+```
+
+The Tailscale pod runs privileged with host networking and persists its
+Tailscale state in a Kubernetes Secret named `tailscale` so pod restarts keep
+the same Tailscale machine identity.
+
 ## Argo CD GitOps Bootstrap
 
 1. Terraform installs Argo CD.

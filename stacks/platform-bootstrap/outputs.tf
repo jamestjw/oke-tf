@@ -37,3 +37,11 @@ output "ingress_external_hostname" {
 output "ingress_external_ip" {
   value = nonsensitive(local.ingress_external_ip)
 }
+
+output "tailscale_exit_node_namespace" {
+  value = var.enable_tailscale_exit_node ? kubernetes_namespace_v1.tailscale[0].metadata[0].name : null
+}
+
+output "tailscale_exit_node_hostname" {
+  value = var.enable_tailscale_exit_node ? var.tailscale_exit_node_hostname : null
+}

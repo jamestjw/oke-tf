@@ -41,3 +41,9 @@ cloudflare_wildcard_dns_record_proxied  = false
 ingress_default_wildcard_certificate_enabled = true
 
 # OCI-specific NLB annotations are defined by default in variables.tf.
+
+# Optional Tailscale exit node running on the existing OKE worker node.
+# Create a tagged, reusable, pre-authorized Tailscale auth key for tag:exit-node.
+enable_tailscale_exit_node   = false
+tailscale_auth_key           = "replace-with-tailscale-auth-key"
+tailscale_exit_node_hostname = "oci-oke-exit-node"

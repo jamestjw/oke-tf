@@ -157,6 +157,48 @@ cd stacks/infra-free-tier
 
 Once apply completes, continue with the Bastion workflow below to reach the private OKE API.
 
+### Optional AMD Tailscale Exit Node
+
+The infra stack can create a standalone `VM.Standard.E2.1.Micro` Tailscale exit node. This is separate from OKE and is intended to get a direct public UDP path for better Tailscale performance.
+
+The module creates:
+
+- a dedicated public `/28` subnet
+- a security list that allows only inbound UDP `41641`
+- one AMD micro instance with no SSH ingress
+- cloud-init bootstrap that installs Tailscale and advertises an exit node
+- Canonical Ubuntu 24.04 by default
+
+Before enabling it, create a Tailscale auth key with:
+
+- `tag:exit-node`
+- reusable enabled
+- pre-authorized enabled
+- ephemeral disabled
+
+Enable it in `stacks/infra-free-tier/terraform.tfvars`:
+
+```hcl
+enable_tailscale_amd_exit_node      = true
+tailscale_amd_exit_node_auth_key   = "tskey-auth-..."
+tailscale_amd_exit_node_hostname   = "oci-amd-exit-node"
+tailscale_amd_exit_node_subnet_cidr = "10.0.4.0/28"
+```
+
+After apply, verify the public IP:
+
+```bash
+terraform output tailscale_amd_exit_node_public_ip
+```
+
+To remove the AMD exit node later, set:
+
+```hcl
+enable_tailscale_amd_exit_node = false
+```
+
+Then run the infra stack plan and apply.
+
 ## OKE Kubernetes Version Upgrade
 
 The Kubernetes version for the OKE control plane and node pool is managed from `stacks/infra-free-tier/terraform.tfvars`:
@@ -357,32 +399,6 @@ Use username `admin` and the password retrieved from the initial admin secret.
 If `argocd_hostname` is set and the wildcard certificate is enabled, NGINX will terminate TLS with the shared wildcard certificate. Create a DNS record in Cloudflare that points `argocd.<zone>` at the public ingress load balancer.
 
 With Cloudflare DNS automation enabled, Terraform manages that record directly.
-
-### Optional Tailscale Exit Node
-
-The platform stack can run a Tailscale exit node on the existing OKE worker
-node. This does not create any additional OCI compute resources.
-
-Before enabling it, create a Tailscale auth key with:
-
-- `tag:exit-node`
-- reusable enabled
-- pre-authorized enabled
-- ephemeral disabled
-
-The tailnet access policy should allow `tag:exit-node` to auto-approve exit-node advertisements.
-
-Enable the add-on in `stacks/platform-bootstrap/terraform.tfvars`:
-
-```hcl
-enable_tailscale_exit_node   = true
-tailscale_auth_key           = "tskey-auth-..."
-tailscale_exit_node_hostname = "oci-oke-exit-node"
-```
-
-The Tailscale pod runs privileged with host networking and persists its
-Tailscale state in a Kubernetes Secret named `tailscale` so pod restarts keep
-the same Tailscale machine identity.
 
 ## Argo CD GitOps Bootstrap
 

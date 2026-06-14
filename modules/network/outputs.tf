@@ -33,3 +33,7 @@ output "pod_nsg_id" {
 output "lb_nsg_id" {
   value = oci_core_network_security_group.load_balancers.id
 }
+
+output "public_route_table_id" {
+  value = oci_core_route_table.public.id
+}

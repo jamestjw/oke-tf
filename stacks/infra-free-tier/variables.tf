@@ -15,6 +15,11 @@ variable "oci_config_profile" {
   default = null
 }
 
+variable "cloudflare_api_token" {
+  type      = string
+  sensitive = true
+}
+
 variable "project_name" {
   type = string
 }
@@ -114,4 +119,50 @@ variable "bastion_max_session_ttl_in_seconds" {
 variable "enable_run_command" {
   type    = bool
   default = false
+}
+
+variable "enable_tailscale_amd_exit_node" {
+  type    = bool
+  default = false
+}
+
+variable "tailscale_amd_exit_node_auth_key" {
+  type      = string
+  default   = null
+  sensitive = true
+}
+
+variable "tailscale_amd_exit_node_hostname" {
+  type    = string
+  default = "oci-amd-exit-node"
+}
+
+variable "tailscale_amd_exit_node_subnet_cidr" {
+  type    = string
+  default = "10.0.4.0/28"
+}
+
+variable "tailscale_amd_exit_node_udp_port" {
+  type    = number
+  default = 41641
+}
+
+variable "tailscale_amd_exit_node_shape" {
+  type    = string
+  default = "VM.Standard.E2.1.Micro"
+}
+
+variable "tailscale_amd_exit_node_image_operating_system" {
+  type    = string
+  default = "Canonical Ubuntu"
+}
+
+variable "tailscale_amd_exit_node_image_operating_system_version" {
+  type    = string
+  default = "24.04"
+}
+
+variable "tailscale_amd_exit_node_boot_volume_size_in_gbs" {
+  type    = number
+  default = 50
 }

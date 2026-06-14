@@ -40,3 +40,10 @@ enable_run_command   = true
 # Optional. Defaults to the whole VCN, which allows future in-VCN runners
 # to reach the private API endpoint without reopening the stack.
 # api_allowed_cidrs = ["10.0.0.0/16"]
+
+# Optional AMD Always Free Tailscale exit node.
+# Uses VM.Standard.E2.1.Micro in a dedicated public subnet and opens only UDP 41641.
+enable_tailscale_amd_exit_node      = false
+tailscale_amd_exit_node_auth_key   = "replace-with-tailscale-auth-key"
+tailscale_amd_exit_node_hostname   = "oci-amd-exit-node"
+tailscale_amd_exit_node_subnet_cidr = "10.0.4.0/28"

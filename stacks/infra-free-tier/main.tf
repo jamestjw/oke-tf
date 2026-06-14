@@ -1,5 +1,9 @@
 data "cloudflare_ip_ranges" "cloudflare" {}
 
+data "oci_identity_availability_domains" "this" {
+  compartment_id = var.tenancy_ocid
+}
+
 module "network" {
   source = "../../modules/network"
 
@@ -54,6 +58,27 @@ module "bastion" {
   client_cidr_block_allow_list = var.bastion_client_cidrs
   max_session_ttl_in_seconds   = var.bastion_max_session_ttl_in_seconds
   freeform_tags                = local.common_tags
+}
+
+module "tailscale_amd_exit_node" {
+  count  = var.enable_tailscale_amd_exit_node ? 1 : 0
+  source = "../../modules/tailscale-exit-node"
+
+  tenancy_ocid                   = var.tenancy_ocid
+  compartment_ocid               = var.compartment_ocid
+  availability_domain            = data.oci_identity_availability_domains.this.availability_domains[0].name
+  name                           = "${local.name_prefix}-tailscale-amd-exit"
+  vcn_id                         = module.network.vcn_id
+  subnet_cidr                    = var.tailscale_amd_exit_node_subnet_cidr
+  public_route_table_id          = module.network.public_route_table_id
+  auth_key                       = var.tailscale_amd_exit_node_auth_key
+  hostname                       = var.tailscale_amd_exit_node_hostname
+  udp_port                       = var.tailscale_amd_exit_node_udp_port
+  shape                          = var.tailscale_amd_exit_node_shape
+  image_operating_system         = var.tailscale_amd_exit_node_image_operating_system
+  image_operating_system_version = var.tailscale_amd_exit_node_image_operating_system_version
+  boot_volume_size_in_gbs        = var.tailscale_amd_exit_node_boot_volume_size_in_gbs
+  freeform_tags                  = local.common_tags
 }
 
 resource "oci_identity_dynamic_group" "run_command" {

@@ -1,0 +1,22 @@
+#cloud-config
+package_update: true
+packages:
+  - curl
+  - iptables
+
+write_files:
+  - path: /etc/sysctl.d/99-tailscale-exit-node.conf
+    permissions: "0644"
+    content: |
+      net.ipv4.ip_forward = 1
+      net.ipv6.conf.all.forwarding = 1
+  - path: /etc/default/tailscaled
+    permissions: "0644"
+    content: |
+      PORT="${udp_port}"
+
+runcmd:
+  - sysctl --system
+  - curl -fsSL https://tailscale.com/install.sh | sh
+  - systemctl enable --now tailscaled
+  - tailscale up --authkey=${auth_key} --advertise-exit-node --hostname=${hostname} --accept-dns=false

@@ -1,8 +1,12 @@
 locals {
   ingress_controller_config = {
+    # These two configs allow nginx to look at the original IP of the user
+    # passed on by cloudflare's header and passes that on to backend apps
     enable-real-ip        = "true"
     forwarded-for-header  = "CF-Connecting-IP"
     proxy-real-ip-cidr    = join(",", data.cloudflare_ip_ranges.cloudflare.cidr_blocks)
+    # important so that nginx can see that X-Forwarded-Proto is already https
+    # and not trigger a redirect loop
     use-forwarded-headers = "true"
   }
 

@@ -160,7 +160,6 @@ variable "argocd_bootstrap_enabled" {
 
 variable "argocd_repo_url" {
   type    = string
-  default = "https://github.com/jamestjw/cluster-gitops.git"
 }
 
 variable "argocd_repo_username" {

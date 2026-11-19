@@ -74,6 +74,7 @@ module "tailscale_amd_exit_node" {
   auth_key                       = var.tailscale_amd_exit_node_auth_key
   hostname                       = var.tailscale_amd_exit_node_hostname
   udp_port                       = var.tailscale_amd_exit_node_udp_port
+  ssh_ingress_cidr               = var.tailscale_amd_exit_node_ssh_ingress_cidr
   shape                          = var.tailscale_amd_exit_node_shape
   image_operating_system         = var.tailscale_amd_exit_node_image_operating_system
   image_operating_system_version = var.tailscale_amd_exit_node_image_operating_system_version

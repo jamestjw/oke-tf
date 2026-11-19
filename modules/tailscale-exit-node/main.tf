@@ -33,6 +33,21 @@ resource "oci_core_security_list" "this" {
     }
   }
 
+  dynamic "ingress_security_rules" {
+    for_each = var.ssh_ingress_cidr == null ? [] : [var.ssh_ingress_cidr]
+
+    content {
+      protocol    = "6" # TCP
+      source      = ingress_security_rules.value
+      description = "SSH administration"
+
+      tcp_options {
+        min = 22
+        max = 22
+      }
+    }
+  }
+
   egress_security_rules {
     protocol    = "all"
     destination = "0.0.0.0/0"

@@ -40,6 +40,11 @@ variable "udp_port" {
   default = 41641
 }
 
+variable "ssh_ingress_cidr" {
+  type    = string
+  default = null
+}
+
 variable "shape" {
   type    = string
   default = "VM.Standard.E2.1.Micro"

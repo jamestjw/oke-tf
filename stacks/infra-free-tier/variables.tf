@@ -147,6 +147,11 @@ variable "tailscale_amd_exit_node_udp_port" {
   default = 41641
 }
 
+variable "tailscale_amd_exit_node_ssh_ingress_cidr" {
+  type    = string
+  default = null
+}
+
 variable "tailscale_amd_exit_node_shape" {
   type    = string
   default = "VM.Standard.E2.1.Micro"

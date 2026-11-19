@@ -204,12 +204,14 @@ Then run the infra stack plan and apply.
 The Kubernetes version for the OKE control plane and node pool is managed from `stacks/infra-free-tier/terraform.tfvars`:
 
 ```hcl
-kubernetes_version = "v1.35.2"
+kubernetes_version = "v1.36.1"
 ```
 
-Before upgrading, confirm the target version is available for OKE in the configured OCI region.
+OKE does not allow skipping minor versions. From `v1.35.2`, upgrade first to
+`v1.36.1`, complete the control-plane and node-pool upgrade, then change the
+value to `v1.37.1` and repeat the process.
 
-Run the upgrade from the infra stack:
+Run the first upgrade from the infra stack:
 
 ```bash
 cd stacks/infra-free-tier
@@ -255,6 +257,10 @@ kubectl version
 ```
 
 Avoid concurrent applies. OCI Object Storage does not provide DynamoDB-style state locking for the S3 backend.
+
+After the first upgrade completes and the replacement node is healthy, set
+`kubernetes_version = "v1.37.1"` and repeat the plan, control-plane apply,
+node-pool apply, node cycle, and verification steps above.
 
 ## Bastion Access
 
